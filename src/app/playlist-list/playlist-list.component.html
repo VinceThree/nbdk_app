@@ -1,0 +1,20 @@
+
+
+
+<div class="h1">Playlists</div>
+<ngb-accordion #acc="ngbAccordion">
+  <ngb-panel *ngFor="let playlistEl of playlist" title="{{playlistEl.name}}">
+    <ng-template ngbPanelContent>
+      <ul class="list-group">
+        <li class="list-group-item">{{"Erstellt am: "+ playlistEl.created_date}}</li>
+        <li class="list-group-item">{{"Erstellt von "+playlistEl.owner_id}}</li>
+
+      </ul>
+    </ng-template>
+  </ngb-panel>
+</ngb-accordion>
+
+<hr>
+  <ngb-pagination [collectionSize]="totalPages" [boundaryLinks]="true" [(page)]="currentPage" (pageChange)="emitNewPage(currentPage)"  aria-label="Default pagination"></ngb-pagination>
+
+
