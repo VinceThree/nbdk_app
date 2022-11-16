@@ -1,0 +1,112 @@
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Add Song</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="mb-3">
+        <label for="title">Title</label>
+        <div class="input-group">
+          <input
+            id="title"
+            class="form-control"
+            placeholder="Title"
+            #inputAddTitle
+          />
+          <input
+            id="artist"
+            class="form-control"
+            placeholder="Artist"
+            #inputAddArtist
+          />
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click');addNewSong(inputAddArtist.value,inputAddTitle.value)">Save</button>
+  </div>
+</ng-template>
+
+
+
+
+<div class="card m-5 ">
+  <div class="card-header">
+    Spotify <button type="button" class="btn btn-success ms-5" (click)="open(content)" >Add New Song</button>
+
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">List of Songs </h5>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <button class="btn btn-outline-secondary" type="button" (click)="filterSong(inputFilter.value)" id="button-addon1" >Title</button>
+      </div>
+      <input type="text" class="form-control" placeholder="Title" aria-label="Example text with button addon" aria-describedby="button-addon1" #inputFilter>
+    </div>
+
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <button class="btn btn-outline-secondary" type="button" (click)="filterArtist(inputFilterArtist.value)" id="button-addon2" >Artist</button>
+      </div>
+      <input type="text" class="form-control" placeholder="Artist" aria-label="Example text with button addon" aria-describedby="button-addon1" #inputFilterArtist>
+    </div>
+
+    <ngb-accordion #acc="ngbAccordion">
+      <ngb-panel *ngFor="let songEl of songs" title="{{songEl.title}}">
+        <ng-template ngbPanelContent>
+
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Title" aria-label="Recipient's username" aria-describedby="basic-addon2" value="{{songEl.title}}" #inputTitle>
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" (click)="changeSongTitle(inputTitle.value,songEl.id)" type="button">Change</button>
+            </div>
+          </div>
+
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Artist" aria-label="Recipient's username" aria-describedby="basic-addon2" value="{{songEl.artist}}" #inputArtist>
+            <div class="input-group-append">
+              <button (click)="changeArtist(inputArtist.value,songEl.id)" class="btn btn-outline-secondary" type="button">Change</button>
+            </div>
+          </div>
+          <button type="button" class="btn btn-danger" (click)="deleteSong(songEl.id)">Delete Song</button>
+
+
+        </ng-template>
+      </ngb-panel>
+    </ngb-accordion>
+
+
+    <hr>
+    <ngb-pagination  class="d-flex justify-content-center" [collectionSize]="totalPages" [(page)]="currentPage" [boundaryLinks]="true">
+      <ng-template ngbPaginationPages let-page let-pages="pages">
+        <li class="ngb-custom-pages-item" *ngIf="pages.length > 0">
+          <div class="mb-3 d-flex flex-nowrap px-2">
+            <label id="paginationInputLabel" for="paginationInput" class="col-form-label me-2 ms-1">Page</label>
+            <input
+              #i
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              class="form-control custom-pages-input"
+              id="paginationInput"
+              [value]="page"
+              (keyup.enter)="selectPage(i.value)"
+              (blur)="selectPage(i.value)"
+              (input)="formatInput($any($event).target)"
+              aria-labelledby="paginationInputLabel paginationDescription"
+              style="width: 2.5rem"
+            />
+            <span id="paginationDescription" class="col-form-label text-nowrap px-2"> of {{pages.length}}</span>
+          </div>
+        </li>
+      </ng-template>
+    </ngb-pagination>
+  </div>
+
+</div>
+
+
+

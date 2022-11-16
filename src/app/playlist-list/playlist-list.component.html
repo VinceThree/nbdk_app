@@ -1,20 +1,150 @@
 
 
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Add Playlist</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="mb-3">
+        <label for="title">Title</label>
+        <div class="input-group">
+          <input
+            id="title"
+            class="form-control"
+            placeholder="Name"
+            #inputAddPlaylistname
+          />
+          <input
+            id="artist"
+            class="form-control"
+            placeholder="Owner"
+            #inputAddOwnerId
+          />
+        </div>
+        <hr>
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <button class="btn btn-outline-secondary" type="button" (click)="filterSong(inputFilter.value)" id="button-addon2" >Title</button>
+          </div>
+          <input type="text" class="form-control" placeholder="Title" aria-label="Example text with button addon" aria-describedby="button-addon2" #inputFilter>
+        </div>
+        <div>
+          <div class="h6">Add for Playlist:</div>
+          <ul class="list-group">
+            <li *ngFor="let songEl of song"
+                class="list-group-item" (click)="addSongToPlaylist(songEl)">{{songEl.title}}</li>
+          </ul>
+        </div>
+        <div>
+          <div class="h6">Songs for Playlist:</div>
+          <ul class="list-group">
+            <li *ngFor="let songsAddEl of songAdd"
+                class="list-group-item">{{songsAddEl.title}}</li>
+          </ul>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click');addNewPlaylist(inputAddPlaylistname.value,inputAddOwnerId.value)">Save</button>
+  </div>
+</ng-template>
 
-<div class="h1">Playlists</div>
-<ngb-accordion #acc="ngbAccordion">
-  <ngb-panel *ngFor="let playlistEl of playlist" title="{{playlistEl.name}}">
-    <ng-template ngbPanelContent>
-      <ul class="list-group">
-        <li class="list-group-item">{{"Erstellt am: "+ playlistEl.created_date}}</li>
-        <li class="list-group-item">{{"Erstellt von "+playlistEl.owner_id}}</li>
 
-      </ul>
-    </ng-template>
-  </ngb-panel>
-</ngb-accordion>
 
-<hr>
-  <ngb-pagination [collectionSize]="totalPages" [boundaryLinks]="true" [(page)]="currentPage" (pageChange)="emitNewPage(currentPage)"  aria-label="Default pagination"></ngb-pagination>
+
+<div class="card m-5 ">
+  <div class="card-header">
+    Spotify <button type="button" class="btn btn-success ms-5" (click)="open(content)" >Add New Playlist</button>
+  </div>
+  <div class="card-body">
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <button class="btn btn-outline-secondary" type="button" (click)="filterName(inputFilter.value)" id="button-addon1" >Title</button>
+      </div>
+      <input type="text" class="form-control" placeholder="Playlist Name" aria-label="Example text with button addon" aria-describedby="button-addon1" #inputFilter>
+    </div>
+
+
+    <h5 class="card-title">List of Playlist</h5>
+
+    <ngb-accordion #acc="ngbAccordion">
+      <ngb-panel *ngFor="let playlistEl of playlist" title="{{playlistEl.name}}">
+        <ng-template ngbPanelContent>
+          <div class="h4 mt-2">Informations:</div>
+          <ul class="list-group">
+            <li class="list-group-item">{{"Erstellt am: "+ playlistEl.created_date}}</li>
+            <li class="list-group-item">{{"Erstellt von "+playlistEl.owner.name}}</li>
+
+            <ngb-accordion #acc="ngbAccordion">
+              <ngb-panel  title="{{'Follower: '+playlistEl.follower_of_playlist.length}}">
+                <ng-template ngbPanelContent>
+                  <ul class="list-group">
+                    <li *ngFor="let follower of playlistEl.follower_of_playlist"
+                        class="list-group-item">{{follower.name}}</li>
+                  </ul>
+                </ng-template>
+              </ngb-panel>
+            </ngb-accordion>
+          </ul>
+          <hr>
+          <div class="h4 mt-2">Songs in Playlist:</div>
+          <div *ngIf="playlistEl.songs_in_playlist.length==0" class="list-group">
+            <div class="list-group-item list-group-item-action flex-column align-items-start ">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{"Kein Song in Playlist"}}</h5>
+              </div>
+              <p class="mb-1">{{""}}</p>
+            </div>
+          </div>
+
+
+          <div *ngIf="playlistEl.songs_in_playlist.length>0" class="list-group">
+            <div *ngFor="let song of playlistEl.songs_in_playlist"
+                 class="list-group-item list-group-item-action flex-column align-items-start ">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{song.title}}</h5>
+              </div>
+              <p class="mb-1">{{song.artist}}</p>
+            </div>
+          </div>
+
+
+
+        </ng-template>
+      </ngb-panel>
+    </ngb-accordion>
+
+    <hr>
+    <ngb-pagination  class="d-flex justify-content-center" [collectionSize]="totalPages" [(page)]="currentPage" [boundaryLinks]="true">
+      <ng-template ngbPaginationPages let-page let-pages="pages">
+        <li class="ngb-custom-pages-item" *ngIf="pages.length > 0">
+          <div class="mb-3 d-flex flex-nowrap px-2">
+            <label id="paginationInputLabel" for="paginationInput" class="col-form-label me-2 ms-1">Page</label>
+            <input
+              #i
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              class="form-control custom-pages-input"
+              id="paginationInput"
+              [value]="page"
+              (keyup.enter)="selectPage(i.value)"
+              (blur)="selectPage(i.value)"
+              (input)="formatInput($any($event).target)"
+              aria-labelledby="paginationInputLabel paginationDescription"
+              style="width: 2.5rem"
+            />
+            <span id="paginationDescription" class="col-form-label text-nowrap px-2"> of {{pages.length}}</span>
+          </div>
+        </li>
+      </ng-template>
+    </ngb-pagination>
+    </div>
+
+</div>
+
 
 
